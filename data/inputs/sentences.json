@@ -1,0 +1,37 @@
+[
+  {
+    "id": "intro_en",
+    "text": "Welcome to the voice cloning demonstration. This is an example of synthetic speech.",
+    "language": "en"
+  },
+  {
+    "id": "intro_fr",
+    "text": "Bienvenue dans la démonstration de clonage vocal. Ceci est un exemple de parole synthétique.",
+    "language": "fr"
+  },
+  {
+    "id": "tech_en",
+    "text": "This technology uses advanced neural networks to replicate human speech patterns.",
+    "language": "en"
+  },
+  {
+    "id": "tech_es",
+    "text": "Esta tecnología utiliza redes neuronales avanzadas para replicar patrones de habla humana.",
+    "language": "es"
+  },
+  {
+    "id": "future_en",
+    "text": "The future of text-to-speech technology looks very promising with these advancements.",
+    "language": "en"
+  },
+  {
+    "id": "goodbye_fr",
+    "text": "Au revoir et merci d'avoir écouté cette démonstration !",
+    "language": "fr"
+  },
+  {
+    "id": "question_es",
+    "text": "¿Puedes distinguir entre la voz original y la voz clonada?",
+    "language": "es"
+  }
+]
