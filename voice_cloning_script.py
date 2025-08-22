@@ -29,10 +29,13 @@ def load_rows_from_json(json_path, default_language):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Voice cloning TTS using Coqui TTS XTTS v2 - JSON batch processing",
+        description="Voice cloning TTS using Coqui TTS XTTS v2",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Example:
+Examples:
+  Simple text-to-speech:
+    python voice_cloning_script.py --speaker-wav data/reference/ref_voice.wav --text "Hello world"
+  
   JSON batch processing:
     python voice_cloning_script.py --speaker-wav data/reference/ref_voice.wav --json data/inputs/sentences.json
         """
@@ -44,8 +47,11 @@ Example:
         help="Path to reference voice audio file (.wav format recommended)"
     )
     parser.add_argument(
+        "--text",
+        help="Single text string to convert to speech"
+    )
+    parser.add_argument(
         "--json", 
-        required=True,
         help="Path to JSON file with array of objects containing id, text, and optional language fields"
     )
     parser.add_argument(
@@ -61,9 +67,12 @@ Example:
     
     args = parser.parse_args()
     
-    # Validate JSON file argument
-    if not args.json:
-        parser.error("--json parameter is required")
+    # Validate arguments - need either text or json
+    if not args.text and not args.json:
+        parser.error("Either --text or --json parameter is required")
+    
+    if args.text and args.json:
+        parser.error("Cannot use both --text and --json parameters at the same time")
     
     # Check if speaker wav file exists
     if not Path(getattr(args, 'speaker_wav') or getattr(args, 'speaker-wav')).exists():
@@ -81,37 +90,56 @@ Example:
     # Create output directory
     out_dir = Path(getattr(args, 'out_dir') or getattr(args, 'out-dir'))
     out_dir.mkdir(parents=True, exist_ok=True)
+    print(f"Output directory: {out_dir}")
     
-    # JSON batch processing
-    rows = load_rows_from_json(args.json, args.language)
-    print(f"Loaded {len(rows)} entries from JSON file")
-    
-    if not rows:
-        print("No valid text entries found to process.")
-        sys.exit(1)
-    
-    # Generate speech for each row
-    print(f"Processing {len(rows)} entries...")
-    successful = 0
-    for i, row in enumerate(rows, 1):
-        output_path = out_dir / f"{row['id']}.wav"
-        print(f"[{i}/{len(rows)}] Generating: {row['id']} ({row['language']}) - '{row['text'][:50]}{'...' if len(row['text']) > 50 else ''}'")
+    if args.text:
+        # Simple text-to-speech
+        output_path = out_dir / "output.wav"
+        print(f"Generating speech from text: '{args.text[:50]}{'...' if len(args.text) > 50 else ''}'")
         
         try:
             tts.tts_to_file(
-                text=row["text"],
+                text=args.text,
                 speaker_wav=getattr(args, 'speaker_wav') or getattr(args, 'speaker-wav'),
-                language=row["language"],
+                language=args.language,
                 file_path=str(output_path),
             )
-            print(f"  ✓ Generated: {output_path}")
-            successful += 1
+            print(f"✓ Generated: {output_path}")
         except Exception as e:
-            print(f"  ✗ Error generating {row['id']}: {e}")
+            print(f"✗ Error generating speech: {e}")
+            sys.exit(1)
     
-    print(f"\nCompleted: {successful}/{len(rows)} files generated successfully")
-    if successful < len(rows):
-        print(f"Failed: {len(rows) - successful} files")
+    elif args.json:
+        # JSON batch processing
+        rows = load_rows_from_json(args.json, args.language)
+        print(f"Loaded {len(rows)} entries from JSON file")
+        
+        if not rows:
+            print("No valid text entries found to process.")
+            sys.exit(1)
+        
+        # Generate speech for each row
+        print(f"Processing {len(rows)} entries...")
+        successful = 0
+        for i, row in enumerate(rows, 1):
+            output_path = out_dir / f"{row['id']}.wav"
+            print(f"[{i}/{len(rows)}] Generating: {row['id']} ({row['language']}) - '{row['text'][:50]}{'...' if len(row['text']) > 50 else ''}'")
+            
+            try:
+                tts.tts_to_file(
+                    text=row["text"],
+                    speaker_wav=getattr(args, 'speaker_wav') or getattr(args, 'speaker-wav'),
+                    language=row["language"],
+                    file_path=str(output_path),
+                )
+                print(f"  ✓ Generated: {output_path}")
+                successful += 1
+            except Exception as e:
+                print(f"  ✗ Error generating {row['id']}: {e}")
+        
+        print(f"\nCompleted: {successful}/{len(rows)} files generated successfully")
+        if successful < len(rows):
+            print(f"Failed: {len(rows) - successful} files")
 
 if __name__ == "__main__":
     main()
