@@ -1,6 +1,15 @@
 # Voice Cloning TTS Project
 
-A voice cloning system using Coqui TTS XTTS v2 for zero-shot voice cloning. This project processes JSON files with multilingual text entries to generate speech using a reference voice sample.
+A voice cloning system using Coqui TTS XTTS v2 for zero-shot voice cloning. This project supports both simple text-to-speech conversion and batch processing of JSON files with multilingual text entries to generate speech using a reference voice sample.
+
+## Features
+
+- **Zero-shot voice cloning**: No training required, works with any reference voice sample
+- **Simple text-to-speech**: Convert single text strings to speech
+- **JSON batch processing**: Process multiple multilingual text entries from structured JSON files
+- **Multilingual support**: English, French, Spanish, German, Italian, Portuguese, and more
+- **CLI interface**: Easy-to-use command-line tool
+- **Error handling**: Comprehensive validation and error reporting
 
 ## Installation
 
@@ -32,6 +41,15 @@ A voice cloning system using Coqui TTS XTTS v2 for zero-shot voice cloning. This
 **View help:**
 ```bash
 python voice_cloning_script.py --help
+```
+
+### Simple Text-to-Speech
+Convert a single text string to speech:
+```bash
+python voice_cloning_script.py \
+  --speaker-wav data/reference/ref_voice.wav \
+  --text "Hello! This is my cloned voice." \
+  --out-dir outputs
 ```
 
 ### JSON Batch Processing
